@@ -5,17 +5,17 @@ from django.urls import reverse
 # Create your models here.
 
 class Ingrediente(models.Model):
-    nombre        = models.CharField(max_length=255, null=True, blank=True)
-    descripcion   = models.TextField(null=True, blank=True)
+    nombre        = models.CharField(max_length=255, blank=True)
+    descripcion   = models.TextField(blank=True)
 
     def __str__(self):
         return str(self.nombre)
 
 class Hamburguesa(models.Model):
-    nombre       = models.CharField(max_length=255, null=True, blank=True)
-    precio       = models.PositiveIntegerField(null=True, blank=True)
-    descripcion  = models.TextField(null=True, blank=True)
-    imagen       = models.URLField(null=True, blank=True)   
+    nombre       = models.CharField(max_length=255, blank=True)
+    precio       = models.PositiveIntegerField(blank=True)
+    descripcion  = models.TextField(blank=True)
+    imagen       = models.URLField(blank=True)   
     ingredientes = models.ManyToManyField(Ingrediente, blank=True)
 
     def __str__(self):
