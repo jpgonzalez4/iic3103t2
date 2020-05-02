@@ -12,6 +12,22 @@ class HamburguesaRudView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         return Hamburguesa.objects.all()
+    
+    def delete(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            serializer = self.get_serializer(instance)
+
+            self.perform_destroy(instance)
+            return Response(
+                        {"code": "200", "descripcion":'hamburguesa eliminada'},
+                        status=status.HTTP_200_OK
+                    )
+        except:
+            return Response(
+                        {"code": "404", "descripcion":'hamburguesa inexistente'},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
 
 class IngredienteRudView(generics.RetrieveUpdateDestroyAPIView):
     pass
@@ -20,6 +36,23 @@ class IngredienteRudView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Ingrediente.objects.all()
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        hamburguesas = Hamburguesa.objects.values_list('ingredientes', flat=True)
+        if instance.id in hamburguesas:
+            return Response(
+                {"code": "404", "descripcion":'Ingrediente no se puede borrar, se encuentra presente en una hamburguesa'},
+                status=status.HTTP_409_CONFLICT
+            )
+        else:
+            self.perform_destroy(instance)
+            return Response(
+                        {"code": "200", "descripcion":'operacion exitosa'},
+                        status=status.HTTP_200_OK
+                    )
+
 
 class HamburguesaIngredienteAddDestroyView(generics.RetrieveUpdateDestroyAPIView):
     pass
@@ -177,14 +210,6 @@ class IngredienteAPIView(mixins.CreateModelMixin, generics.ListAPIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-    def delete(self, request, *args, **kwargs):
-        try:
-            return self.update(request, *args, **kwargs)
-        except:
-            return Response(
-                {"code": "404", "descripcion":'ingrediente inexistente'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
     def post(self, request, *args, **kwargs):
         try:
             return self.create(request, *args, **kwargs)
