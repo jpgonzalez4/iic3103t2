@@ -5,8 +5,8 @@ from django.urls import reverse
 # Create your models here.
 
 class Ingrediente(models.Model):
-    nombre        = models.CharField(max_length=255, blank=True)
-    descripcion   = models.TextField(blank=True)
+    nombre        = models.CharField(max_length=255)
+    descripcion   = models.TextField()
 
     def __str__(self):
         return str(self.nombre)
